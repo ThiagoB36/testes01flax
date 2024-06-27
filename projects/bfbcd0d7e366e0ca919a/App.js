@@ -268,46 +268,128 @@
         }
 
         const fxInitLoop = (sttInit,setInit,sttRouter,setRouter,setComps) => {
-          const funcToComps = [
-              ({ getRoute, goTo }) => {
-                const screenData = { path: 'home', name: 'Home' };
-                getRoute(screenData.path);
+          const funcToComps = [({ getRoute, goTo }) => {
 
-                const Comp = () => {
-                  const stlView = {
-                    backgroundColor: 'black',
+              const screenData = { path: 'home', name: 'Home' };
+              getRoute(screenData.path);
 
-                    height: '100%',
-                    width: '100%',
-
-                    justifyContent:'center',
-                    alignItems:'center',
-                  }
-
-                  const stlText1 = {
-                    color:'#aaa',
-                    marginTop: 20,
-                    fontSize: 20,
-                    textAlign:'center',
-                  };
-
-                  return (
-                    <RN.View style={stlView}>
-                      <RN.Text
-                        style={stlText1}
-                        children='Adicione uma tela para iniciar!'
-                        />
-                    </RN.View>
-                  )
+              const Comp = ( ) => {
+                const stlDf = {
+                  backgroundColor: '#101',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100%',
+                  width: '100%'
                 };
+                const stl = [{  backgroundColor: '#101',  width: '100%',  height: '100%',  justifyContent: 'center',  alignItems: 'center',}];
 
-                return { path: screenData.path, comp: Comp };
+                const children = [() => {
+
+          const arrStls = [{
+                  backgroundColor: 'purple',
+                  minHeight: 10,
+                  width: "100%"
+                }];
+          const children = [() => {
+
+            const arrStls = [{
+                color: 'white',
+                fontSize: '20px',
+              }];
+            let children = "teste 01";
+            const arrProps = [{}];
+            const stlDf = {
+              color: 'white',
+              fontSize: '20px',
+            };
+
+            const isChildVar = children.includes("{{") 
+            && children.includes("}}");
+            if(isChildVar){
+              const varName1 = children.replace('{{', '').replace('}}','');
+              const newChildren = useData(ct => ct[varName1]);
+              children = newChildren;
+            }
+
+            const stl = arrStls.map(style => {
+              const txtVal = Object.values(style)[0];
+              const isVariable = txtVal.includes("{{") && txtVal.includes("}}");
+  
+              if(isVariable){
+                const propName = Object.keys(style)[0];
+                const varName2 = txtVal.replace('{{', '').replace('}}','');
+                const varValue = useData(ct => ct[varName2]);
+  
+                return {[propName]: varValue};
+              }
+  
+              return style;
+            });
+
+            const userEnteredProps = {};
+
+            for (const object of arrProps) {
+              for (const keyProp in object) {
+                const valueProp = object[keyProp];
+                userEnteredProps[keyProp] = valueProp;
+              }
+            }
+
+            const allProps = {
+              style: [stlDf,stl],
+              children: children,
+
+              ...userEnteredProps
+            };
+
+
+          return (
+            <RN.Text {...allProps} />
+          );
+        }];
+
+          const stl = arrStls.map(style => {
+            const txtVal = Object.values(style)[0];
+            const isVariable = txtVal.includes("{{") && txtVal.includes("}}");
+
+            if(isVariable){
+              const propName = Object.keys(style)[0];
+              const varName = txtVal.replace('{{', '').replace('}}','');
+            
+              const varValue = useData(ct => ct[varName]);
+
+              return {[propName]: varValue};
+            }
+
+            return style;
+          });
+
+          const stlDf = {
+            backgroundColor: 'purple',
+            minHeight: 10,
+            width: '100%'
+          }
+
+          return (
+            <RN.View style={[stlDf,stl]}>
+              {children.map((Item, idx) => (
+                  <Item key={idx} />
+              ))}
+            </RN.View>
+          );
+        }];
 
                 return (
-                  <RN.Text children='Bem-Vindo!'/>
-                )
-              }
-              ]
+                  <RN.View style={[stlDf,stl]}>
+                    {children.map((Item, idx) => (
+                      <Item key={idx} />
+                    ))}
+                  </RN.View>
+                );
+              };
+
+              return { path: screenData.path, comp: Comp };
+          }]
 
           const getComps = funcToComps.map(setItem => {
             if (!sttInit) return;
